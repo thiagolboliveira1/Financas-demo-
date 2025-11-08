@@ -1,5 +1,5 @@
 self.addEventListener('install', (e)=>{
-  e.waitUntil(caches.open('nublue-v1').then(cache=>cache.addAll([
+  e.waitUntil(caches.open('nublue-v3').then(cache=>cache.addAll([
     './','./index.html','./styles.css','./app.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png'
   ])));
 });

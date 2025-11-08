@@ -9,13 +9,13 @@
   <meta name="apple-mobile-web-app-title" content="Financeiro Família" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <title>Financeiro Família — NuBlue</title>
+  <title>Financeiro Família — NuBlue v3</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
     <div class="brand hamburger">
-      <button id="btnMenu" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="#235" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <button id="btnMenu" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="#22335a" stroke-width="2" stroke-linecap="round"/></svg></button>
       <span class="logo">FF</span>
       <h1>Financeiro Família</h1>
     </div>
@@ -27,104 +27,122 @@
   </header>
 
   <nav class="tabs">
-    <button data-tab="dashboard" class="active">Dashboard</button>
-    <button data-tab="planilha">Planilha</button>
+    <button data-tab="entradas" class="active">Entradas</button>
+    <button data-tab="despesas">Despesas</button>
     <button data-tab="resumo">Resumo</button>
     <button data-tab="metas">Metas</button>
+    <button data-tab="backup">Backup</button>
   </nav>
 
   <main class="container">
-    <!-- DASHBOARD -->
-    <section id="tab-dashboard" class="tab active">
-      <div class="cards">
-        <div class="card kpi"><span>Receitas (mês)</span><strong id="kpiIncome">R$ 0,00</strong></div>
-        <div class="card kpi"><span>Despesas (mês)</span><strong id="kpiExpense">R$ 0,00</strong></div>
-        <div class="card kpi"><span>Saldo (mês)</span><strong id="kpiBalance">R$ 0,00</strong></div>
+    <!-- ENTRADAS -->
+    <section id="tab-entradas" class="tab active">
+      <div class="card kpis">
+        <div><span>Bruto (mês)</span><strong id="entBruto">R$ 0,00</strong></div>
+        <div><span>Dízimo (10%)</span><strong id="entDizimo">R$ 0,00</strong></div>
+        <div><span>Líquido (mês)</span><strong id="entLiquido">R$ 0,00</strong></div>
       </div>
-      <div class="toolbar">
-        <select id="filterWallet"><option value="">Todas as carteiras</option></select>
-        <select id="filterCategory"><option value="">Todas as categorias</option></select>
-        <select id="filterKind">
-          <option value="">Todas</option>
-          <option value="fixa">Fixas</option>
-          <option value="variavel">Variáveis</option>
-        </select>
-        <button id="btnClearFilters" class="ghost">Limpar</button>
-      </div>
-      <div class="quick">
-        <button id="btnQuickIncome" class="primary">+ Receita</button>
-        <button id="btnQuickExpense" class="primary outline">+ Despesa</button>
-        <button id="btnQuickToday" class="ghost">Hoje</button>
-      </div>
-    </section>
 
-    <!-- PLANILHA -->
-    <section id="tab-planilha" class="tab">
-      <div class="card sheet-head">
-        <form id="formEntry" class="row">
-          <input id="date" type="date" required>
-          <input id="category" placeholder="Categoria" required list="dlCat">
-          <datalist id="dlCat"></datalist>
-          <input id="wallet" placeholder="Carteira" required list="dlWal">
-          <datalist id="dlWal"></datalist>
-          <select id="type"><option value="income">Receita</option><option value="expense">Despesa</option></select>
-          <select id="kind"><option value="variavel">Variável</option><option value="fixa">Fixa</option></select>
-          <input id="amount" type="number" step="0.01" inputmode="decimal" placeholder="Valor (R$)" required>
-          <input id="note" type="text" placeholder="Observação">
-          <button type="submit" class="primary">Adicionar</button>
+      <div class="card form">
+        <h2>Nova entrada</h2>
+        <form id="formEntrada" class="col">
+          <input id="eDate" type="date" required>
+          <input id="eDesc" placeholder="Descrição / Cliente" required>
+          <input id="eWallet" placeholder="Carteira (ex.: Nubank, Ailos)">
+          <input id="eValor" type="number" step="0.01" inputmode="decimal" placeholder="Valor bruto (R$)" required>
+          <div class="row small">
+            <label class="chip">Dízimo automático: 10%</label>
+            <label class="chip">Será descontado e salvo</label>
+          </div>
+          <button class="primary">Adicionar entrada</button>
         </form>
       </div>
-      <div class="card sheet">
-        <div class="sheet-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Data</th><th>Categoria</th><th>Carteira</th><th>Tipo</th><th>Valor</th><th>Obs</th><th>Grupo</th><th class="center">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-        <div class="sheet-foot">
-          <div><span>Total Receitas:</span> <strong id="tIncome">R$ 0,00</strong></div>
-          <div><span>Total Despesas:</span> <strong id="tExpense">R$ 0,00</strong></div>
-          <div><span>Saldo do Período:</span> <strong id="tBalance">R$ 0,00</strong></div>
-        </div>
+
+      <div id="listaEntradas" class="stack"></div>
+    </section>
+
+    <!-- DESPESAS -->
+    <section id="tab-despesas" class="tab">
+      <div class="card kpis">
+        <div><span>Despesas (mês)</span><strong id="despTotal">R$ 0,00</strong></div>
+        <div><span>Fixas</span><strong id="despFixas">R$ 0,00</strong></div>
+        <div><span>Variáveis</span><strong id="despVar">R$ 0,00</strong></div>
       </div>
+
+      <div class="card form">
+        <h2>Nova despesa</h2>
+        <form id="formDespesa" class="col">
+          <input id="dDate" type="date" required>
+          <input id="dCategoria" placeholder="Categoria (ex.: Mercado, Luz)" required>
+          <input id="dWallet" placeholder="Carteira (ex.: Nubank)">
+          <select id="dKind">
+            <option value="fixa">Fixa</option>
+            <option value="variavel">Variável</option>
+          </select>
+          <input id="dValor" type="number" step="0.01" inputmode="decimal" placeholder="Valor (R$)" required>
+          <input id="dObs" placeholder="Observação (opcional)">
+          <button class="primary">Adicionar despesa</button>
+        </form>
+      </div>
+
+      <div id="listaDespesas" class="stack"></div>
     </section>
 
     <!-- RESUMO -->
     <section id="tab-resumo" class="tab">
-      <div class="card">
-        <h2>Por Categoria</h2>
-        <ul id="sumByCategory" class="list"></ul>
+      <div class="card kpis wide">
+        <div><span>Bruto</span><strong id="kBruto">R$ 0,00</strong></div>
+        <div><span>Dízimo</span><strong id="kDizimo">R$ 0,00</strong></div>
+        <div><span>Líquido</span><strong id="kLiquido">R$ 0,00</strong></div>
+        <div><span>Despesas</span><strong id="kDespesas">R$ 0,00</strong></div>
+        <div><span>Saldo</span><strong id="kSaldo">R$ 0,00</strong></div>
       </div>
+
       <div class="card">
-        <h2>Fixas vs Variáveis</h2>
-        <ul id="sumByKind" class="list"></ul>
-      </div>
-      <div class="card">
-        <h2>Por Carteira</h2>
-        <ul id="sumByWallet" class="list"></ul>
+        <h2>Investimento sugerido</h2>
+        <p class="muted">Sugerimos até <b>30%</b> do líquido, limitado pelo disponível (líquido − despesas). Ajuste no controle:</p>
+        <div class="invest">
+          <div class="line"><span>% sugerido</span><strong id="pctSug">0%</strong></div>
+          <input type="range" id="pctRange" min="0" max="50" value="0">
+          <div class="line"><span>Investir este mês</span><strong id="valInvest">R$ 0,00</strong></div>
+        </div>
       </div>
     </section>
 
     <!-- METAS -->
     <section id="tab-metas" class="tab">
       <div class="card">
-        <h2>Metas (limite mensal por categoria)</h2>
-        <form id="formBudget" class="toolbar">
-          <input id="budgetCategory" placeholder="Categoria" required list="dlCat">
-          <input id="budgetAmount" type="number" step="0.01" inputmode="decimal" placeholder="Limite (R$)" required>
-          <button class="primary">Definir</button>
+        <h2>Metas financeiras</h2>
+        <form id="formMeta" class="grid2">
+          <input id="mNome" placeholder="Nome da meta (ex.: Serasa)" required>
+          <input id="mAlvo" type="number" step="0.01" inputmode="decimal" placeholder="Valor alvo (R$)" required>
+          <input id="mAte" type="month" placeholder="Prazo">
+          <button class="primary">Adicionar meta</button>
         </form>
-        <ul id="budgets" class="list"></ul>
+        <div id="metas" class="stack"></div>
+      </div>
+      <div class="card">
+        <h2>Distribuição do investimento</h2>
+        <div id="dist" class="stack"></div>
+      </div>
+    </section>
+
+    <!-- BACKUP -->
+    <section id="tab-backup" class="tab">
+      <div class="card">
+        <h2>Backup & Restauração (JSON)</h2>
+        <div class="row">
+          <button id="btnExport" class="primary">Exportar backup</button>
+          <input type="file" id="fileImport" accept="application/json">
+          <button id="btnImport">Importar backup</button>
+        </div>
+        <p class="muted">Use para trocar de celular ou antes de atualizar arquivos no GitHub.</p>
       </div>
     </section>
   </main>
 
   <footer class="bottombar">
-    <span>NuBlue • Local • PDF do mês • Menu lateral com gesto</span>
+    <span>NuBlue v3 • Local • PDF do mês • Menu lateral com gesto</span>
   </footer>
 
   <!-- Drawer -->
@@ -132,13 +150,13 @@
   <aside class="drawer" id="drawer">
     <header><strong>Menu</strong></header>
     <nav>
-      <a href="#" data-go="dashboard"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h7V3H3v9Zm0 9h7v-7H3v7Zm11 0h7v-9h-7v9Zm0-18v7h7V3h-7Z" fill="#3F7DFF"/></svg></span>Dashboard</a>
-      <a href="#" data-go="planilha"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 4h14M9 3v18" stroke="#3F7DFF" stroke-width="2"/></svg></span>Planilha</a>
-      <a href="#" data-go="resumo"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19h16M6 17V7m6 10V5m6 14V11" stroke="#3F7DFF" stroke-width="2" stroke-linecap="round"/></svg></span>Resumo</a>
-      <a href="#" data-go="metas"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12h10a4 4 0 0 1 0 8H4v-8Z" fill="#22C55E"/><path d="M4 12a8 8 0 1 1 8 8" stroke="#3F7DFF" stroke-width="2"/></svg></span>Metas</a>
-      <a href="#" id="goPDF"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" stroke="#3F7DFF" stroke-width="2"/><path d="M14 2v6h6" stroke="#3F7DFF" stroke-width="2"/><path d="M8 14h8M8 18h8" stroke="#3F7DFF" stroke-width="2" stroke-linecap="round"/></svg></span>PDF do mês</a>
-      <a href="#" id="goReset"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 1 1-3-6.7" stroke="#3F7DFF" stroke-width="2"/><path d="M3 12h6" stroke="#3F7DFF" stroke-width="2" stroke-linecap="round"/></svg></span>Resetar dados (local)</a>
-      <a href="#" id="goAbout"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#3F7DFF" stroke-width="2"/><path d="M12 8v.01M12 11v5" stroke="#3F7DFF" stroke-width="2" stroke-linecap="round"/></svg></span>Sobre</a>
+      <a href="#" data-go="entradas">Entradas</a>
+      <a href="#" data-go="despesas">Despesas</a>
+      <a href="#" data-go="resumo">Resumo</a>
+      <a href="#" data-go="metas">Metas</a>
+      <a href="#" data-go="backup">Backup</a>
+      <a href="#" id="goPDF">PDF do mês</a>
+      <a href="#" id="goReset">Resetar dados (local)</a>
     </nav>
   </aside>
 
