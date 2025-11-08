@@ -1,23 +1,11 @@
-# Financeiro Família — NuBlue v3
+# FLOW v7 — Finanças Organizadas (com PIN 2580)
+- Abertura no **Resumo** com **Entrada Rápida** (e botão para ir a Entradas).
+- Entradas familiares (Thiago / Adriele) com total, entrada, restante, %, dízimo configurável e líquido.
+- Despesas com Shopee destacada, fixas/variáveis.
+- Parcelamentos (Ailos / Carro) com total do contrato, pagas/restantes e progresso.
+- Metas: Serasa — Claro (325,52), Serasa — Shopee (173,59), 13º (5.000), Viagem (2.500), Reserva (3.000).
+- Backup/Restore + Snapshot do mês.
+- PWA + PDF do mês.
+- PIN de acesso: 2580 (em index.html).
 
-App web simples, focado em cards (sem rolagem lateral), com:
-- Entradas por comissão com **dízimo automático de 10%** por entrada.
-- Despesas fixas/variáveis (cards, tudo editável).
-- Resumo com KPIs + **investimento sugerido** (até 30% do líquido; ajuste no slider).
-- **Metas**: Serasa, 13º Thiago, Viagem e Reserva (pré-carregadas e editáveis).
-- **Backup/Restore** em JSON (sem servidor).
-- **PWA** (instalar na tela inicial).
-
-## Atualizar no GitHub Pages
-1. Faça download deste repositório (ou do ZIP gerado).
-2. Suba os arquivos no seu repo (branch `main`).
-3. Settings → Pages → Deploy from a branch (root).
-4. Abra a URL no iPhone → Compartilhar → **Adicionar à Tela de Início**.
-
-## Backup
-- Exportar: aba **Backup** → Exportar backup → baixa `financeiro-backup.json`.
-- Importar: selecione o arquivo e clique **Importar backup**.
-
-## Observações
-- Todos os dados ficam **no seu aparelho** (LocalStorage).
-- O dízimo é **sempre 10%** do valor bruto de cada entrada.
+Publicar no GitHub Pages: subir todos os arquivos deste ZIP para a branch main e ativar Pages.

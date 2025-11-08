@@ -1,1 +1,36 @@
-<!DOCTYPE html><html><body><h1>NuBlue v4</h1><p>App carregado. (Versão simplificada para debug do download)</p></body></html>
+
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>FLOW — Acesso</title>
+<style>
+:root{--line:#cdd9f5;--accent:#3F7DFF;--bg:#E8F0FF;}
+*{box-sizing:border-box} body{display:grid;place-items:center;height:100svh;background:var(--bg);margin:0;font-family:-apple-system,system-ui,Arial}
+.card{background:#fff;padding:24px;border-radius:16px;width:min(92%,360px);box-shadow:0 10px 30px rgba(0,0,0,.08);border:1px solid var(--line)}
+h1{margin:0 0 8px 0} p{margin:6px 0 14px 0;color:#334155}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);font-size:1.2rem}
+button{margin-top:14px;width:100%;padding:14px;border-radius:12px;background:var(--accent);color:#fff;font-size:1.1rem;border:0;cursor:pointer}
+.err{color:#b91c1c;display:none;text-align:center;margin-top:10px}
+.logo{width:200px;display:block;margin:0 auto 6px}
+.small{font-size:.9rem;color:#475569;text-align:center;margin-top:10px}
+</style>
+</head><body>
+<div class="card">
+  <img src="assets/logo.png" class="logo" alt="FLOW">
+  <h1 style="text-align:center;">Bem-vindo</h1>
+  <p style="text-align:center;">Digite o PIN para entrar</p>
+  <input type="password" id="pin" maxlength="4" inputmode="numeric" placeholder="PIN (4 dígitos)"/>
+  <button onclick="auth()">Entrar</button>
+  <div class="err" id="err">PIN incorreto</div>
+  <div class="small">Dica: 2580</div>
+</div>
+<script>
+function auth(){
+  const pin=document.getElementById('pin').value.trim();
+  if(pin==="2580"){
+    location.href="app.html";
+  }else{
+    document.getElementById('err').style.display='block';
+  }
+}
+</script>
+</body></html>
