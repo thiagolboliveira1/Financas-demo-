@@ -70,3 +70,9 @@ footer.bottombar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);
   .container{padding:0}
   .card{border:0}
 }
+
+
+/* v7.2: seções empilhadas (uma página), rolagem vertical entre âncoras */
+.tab{scroll-margin-top:140px;}
+/* Remover dependência de .active para exibir/ocultar: tudo visível */
+.tab{display:block;}

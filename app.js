@@ -41,18 +41,26 @@ function monthFilter(list, key){ const m=mstr(); return list.filter(x => (x[key]
 
 /* Totais */
 function totalsEntradas(){
-  const arr = filterByOwner(monthFilter(state.entradas,'date'));
+  // KPIs SEM filtro de proprietário (Família soma completa)
+  const arr = monthFilter(state.entradas,'date');
   const rate = (state.config?.dizimo||10)/100;
   let bruto=0,diz=0,liq=0, thi=0, adr=0;
-  arr.forEach(e=>{ bruto+=e.entrada; const dz=+(e.entrada*rate).toFixed(2), lq=+(e.entrada-dz).toFixed(2); diz+=dz; liq+=lq; if(e.owner==='Thiago') thi+=lq; if(e.owner==='Adriele') adr+=lq; });
+  arr.forEach(e=>{
+    bruto+=e.entrada;
+    const dz=+(e.entrada*rate).toFixed(2), lq=+(e.entrada-dz).toFixed(2);
+    diz+=dz; liq+=lq;
+    if(e.owner==='Thiago') thi+=lq;
+    if(e.owner==='Adriele') adr+=lq;
+  });
   return {bruto,diz,liq,thi,adr};
 }
 function totalsDespesas(){
-  const arr = filterByOwner(monthFilter(state.despesas,'date'));
+  // KPIs SEM filtro de proprietário (Família soma completa)
+  const arr = monthFilter(state.despesas,'date');
   const total = arr.reduce((s,x)=>s+x.valor,0);
   const fixas = arr.filter(x=>x.kind==='fixa').reduce((s,x)=>s+x.valor,0);
   const shopee = arr.filter(x=>(x.categoria||'').toLowerCase()==='shopee').reduce((s,x)=>s+x.valor,0);
-  const variaveis = total-fixas;
+  const variaveis = total - fixas;
   return {total,fixas,variaveis,shopee};
 }
 function saldoMes(){ const e=totalsEntradas(), d=totalsDespesas(); return {...e,...d,saldo:e.liq-d.total}; }
@@ -213,7 +221,14 @@ function addMeta(ev){ ev.preventDefault(); state.metas.push({ id:uid(), nome:qs(
 
 /* Navegação */
 let _drawer,_overlay,_btn;
-function go(tab){ qsa('.tabs button').forEach(b=>{ const is=b.dataset.tab===tab; b.classList.toggle('active',is); b.setAttribute('aria-selected',String(is)); }); qsa('.tab').forEach(s=> s.classList.toggle('active', s.id==='tab-'+tab)); document.getElementById('main').scrollIntoView({behavior:'smooth', block:'start'}); closeDrawer(); }
+function go(tab){
+  // v7.2: apenas rola até a seção; todas ficam visíveis
+  const sec = document.getElementById('tab-'+tab);
+  if(sec){ sec.scrollIntoView({behavior:'smooth', block:'start'}); }
+  // feedback visual nas abas
+  qsa('.tabs button').forEach(b=>{ const is=b.dataset.tab===tab; b.classList.toggle('active',is); b.setAttribute('aria-selected',String(is)); });
+  closeDrawer();
+}); // v7.2: não escondemos mais seções document.getElementById('main').scrollIntoView({behavior:'smooth', block:'start'}); closeDrawer(); }
 function openDrawer(){ _drawer.classList.add('show'); _overlay.classList.add('show'); _btn.setAttribute('aria-expanded','true'); _drawer.setAttribute('aria-hidden','false'); }
 function closeDrawer(){ _drawer.classList.remove('show'); _overlay.classList.remove('show'); _btn.setAttribute('aria-expanded','false'); _drawer.setAttribute('aria-hidden','true'); }
 
