@@ -15,7 +15,7 @@
       <button id="btnMenu" aria-label="Menu" class="icon-btn" aria-controls="drawer" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="#22335a" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <img src="assets/logo.png?v=7.3" alt="FLOW logo" class="logo-img">
+      <img src="assets/logo.svg?v=7.4" alt="FLOW logo" class="logo-img">
     </div>
     <div class="right">
       <select id="filterOwner">
@@ -41,7 +41,7 @@
   </nav>
 
   <main id="main" class="container">
-    <!-- RESUMO (landing) -->
+    <!-- RESUMO -->
     <section id="tab-resumo" class="tab">
       <div class="card kpis wide">
         <div><span>Bruto</span><strong id="kBruto">R$ 0,00</strong></div>
@@ -50,17 +50,15 @@
         <div><span>Despesas</span><strong id="kDespesas">R$ 0,00</strong></div>
         <div><span>Saldo</span><strong id="kSaldo">R$ 0,00</strong></div>
       </div>
-
       <div class="card">
         <h2>Investimento sugerido</h2>
-        <p class="muted">Até <b id="maxPct">30%</b> do líquido, limitado por (líquido − despesas). Ajuste:</p>
+        <p class="muted">Até <b id="maxPct">30%</b> do líquido (limitado por líquido − despesas).</p>
         <div class="invest">
           <div class="line"><span>% sugerido</span><strong id="pctSug">0%</strong></div>
           <input type="range" id="pctRange" min="0" max="50" value="0">
           <div class="line"><span>Investir este mês</span><strong id="valInvest">R$ 0,00</strong></div>
         </div>
       </div>
-
       <div class="card">
         <h2>Entrada rápida</h2>
         <form id="formQuick" class="col">
@@ -86,7 +84,6 @@
         <div><span>Thiago</span><strong id="entThiago">R$ 0,00</strong></div>
         <div><span>Adriele</span><strong id="entAdriele">R$ 0,00</strong></div>
       </div>
-
       <div class="card form">
         <h2>Nova entrada</h2>
         <form id="formEntrada" class="col">
@@ -100,7 +97,6 @@
           <button class="primary wfull">Adicionar</button>
         </form>
       </div>
-
       <div id="listaEntradas" class="stack"></div>
     </section>
 
@@ -112,7 +108,6 @@
         <div><span>Variáveis</span><strong id="despVar">R$ 0,00</strong></div>
         <div><span>Shopee</span><strong id="despShopee">R$ 0,00</strong></div>
       </div>
-
       <div class="card form">
         <h2>Nova despesa</h2>
         <form id="formDespesa" class="col">
@@ -125,7 +120,6 @@
           <button class="primary wfull">Adicionar</button>
         </form>
       </div>
-
       <div id="listaDespesas" class="stack"></div>
     </section>
 
@@ -190,7 +184,7 @@
   </main>
 
   <footer class="bottombar">
-    <span>FLOW v7 • Local • PDF do mês • PWA</span>
+    <span>FLOW v7.4 • Local • PDF do mês • PWA</span>
   </footer>
 
   <!-- Drawer -->

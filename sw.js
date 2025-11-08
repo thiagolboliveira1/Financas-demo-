@@ -1,5 +1,5 @@
 
-const CACHE = 'flow-v7-3';
+const CACHE = 'flow-v7-4';
 const ASSETS = [
   './',
   './index.html',
@@ -9,7 +9,7 @@ const ASSETS = [
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './assets/logo.png?v=7.3'
+  './assets/logo.svg?v=7.4'
 ];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));

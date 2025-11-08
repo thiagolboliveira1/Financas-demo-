@@ -1,5 +1,5 @@
-/* FLOW v7 — Dashboard + Entradas após login */
-const LS={ entradas:"flow:v7:entradas",despesas:"flow:v7:despesas",metas:"flow:v7:metas",parcelas:"flow:v7:parcelas",config:"flow:v7:config" };
+/* FLOW v7.4 — soma familiar + scroll de menu + SVG logo */
+const LS={ entradas:"flow:v7_4:entradas",despesas:"flow:v7_4:despesas",metas:"flow:v7_4:metas",parcelas:"flow:v7_4:parcelas",config:"flow:v7_4:config" };
 const qs=(s,el=document)=>el.querySelector(s); const qsa=(s,el=document)=>[...el.querySelectorAll(s)];
 const state={ entradas:[], despesas:[], metas:[], parcelas:[], config:{ dizimo:10, investMax:30 } };
 
@@ -33,29 +33,22 @@ function seedMetas(){
   ]; saveAll();
 }
 function seedParcelas(){
-  state.parcelas.push({ id:uid(), nome:"Ailos (acordo)", parcela:196.63, total:25, pagas:2 });
-  state.parcelas.push({ id:uid(), nome:"Carro", parcela:767.32, total:48, pagas:22 });
-  saveAll();
+  state.parcelas=[
+    { id:uid(), nome:"Ailos (acordo — não conta corrente)", parcela:196.63, total:25, pagas:2 },
+    { id:uid(), nome:"Carro", parcela:767.32, total:48, pagas:22 }
+  ]; saveAll();
 }
 function monthFilter(list, key){ const m=mstr(); return list.filter(x => (x[key]||"").startsWith(m)); }
 
-/* Totais */
+/* Totais (KPIs com soma familiar sempre) */
 function totalsEntradas(){
-  // KPIs SEM filtro de proprietário (Família soma completa)
   const arr = monthFilter(state.entradas,'date');
   const rate = (state.config?.dizimo||10)/100;
   let bruto=0,diz=0,liq=0, thi=0, adr=0;
-  arr.forEach(e=>{
-    bruto+=e.entrada;
-    const dz=+(e.entrada*rate).toFixed(2), lq=+(e.entrada-dz).toFixed(2);
-    diz+=dz; liq+=lq;
-    if(e.owner==='Thiago') thi+=lq;
-    if(e.owner==='Adriele') adr+=lq;
-  });
+  arr.forEach(e=>{ bruto+=e.entrada; const dz=+(e.entrada*rate).toFixed(2), lq=+(e.entrada-dz).toFixed(2); diz+=dz; liq+=lq; if(e.owner==='Thiago') thi+=lq; if(e.owner==='Adriele') adr+=lq; });
   return {bruto,diz,liq,thi,adr};
 }
 function totalsDespesas(){
-  // KPIs SEM filtro de proprietário (Família soma completa)
   const arr = monthFilter(state.despesas,'date');
   const total = arr.reduce((s,x)=>s+x.valor,0);
   const fixas = arr.filter(x=>x.kind==='fixa').reduce((s,x)=>s+x.valor,0);
@@ -65,20 +58,20 @@ function totalsDespesas(){
 }
 function saldoMes(){ const e=totalsEntradas(), d=totalsDespesas(); return {...e,...d,saldo:e.liq-d.total}; }
 
-/* Render Entradas */
+/* Render Entradas (lista filtrável) */
 function renderEntradas(){
   const wrap=qs('#listaEntradas'); wrap.innerHTML='';
   const rate=(state.config?.dizimo||10)/100;
   const arr=filterByOwner(monthFilter(state.entradas,'date')).sort((a,b)=>a.date.localeCompare(b.date));
   arr.forEach(e=>{
-    const diz=+(e.entrada*rate).toFixed(2); const liq=+(e.entrada-diz).toFixed(2);
+    const dz=+(e.entrada*rate).toFixed(2), lq=+(e.entrada-dz).toFixed(2);
     const rest=Math.max(0, +(e.total-e.entrada).toFixed(2)); const pct=e.total>0?Math.round((e.entrada/e.total)*100):0;
     const el=document.createElement('div'); el.className='item';
     el.innerHTML=`<div class="top"><strong>${e.owner} — ${e.cliente}</strong>
       <div class="actions"><button class="mini">Editar</button><button class="mini danger">Excluir</button></div></div>
       <div class="meta"><span class="badge">${e.date}</span><span class="badge">${e.forma}</span></div>
       <div class="meta"><span>Total serviço: <b>${money(e.total)}</b></span><span>Entrada: <b>${money(e.entrada)}</b></span><span>Resta: <b>${money(rest)}</b></span><span>Recebido: <b>${pct}%</b></span></div>
-      <div class="meta"><span>Dízimo (${Math.round(rate*100)}%): <b>${money(diz)}</b></span><span>Líquido: <b class="amt">${money(liq)}</b></span></div>`;
+      <div class="meta"><span>Dízimo (${Math.round(rate*100)}%): <b>${money(dz)}</b></span><span>Líquido: <b class="amt">${money(lq)}</b></span></div>`;
     el.querySelector('.danger').addEventListener('click',()=>{ if(confirm('Excluir entrada?')){ state.entradas=state.entradas.filter(x=>x.id!==e.id); saveAll(); renderAll(); } });
     el.querySelector('.mini:not(.danger)').addEventListener('click',()=>{
       el.innerHTML=`<form class="col">
@@ -198,8 +191,21 @@ function importBackup(){ const f=qs('#fileImport').files[0]; if(!f) return alert
   const r=new FileReader(); r.onload=()=>{ try{ const o=JSON.parse(r.result); state.entradas=o.entradas||[]; state.despesas=o.despesas||[]; state.metas=o.metas||[]; state.parcelas=o.parcelas||[]; state.config=Object.assign(state.config,o.config||{}); saveAll(); renderAll(); alert('Backup importado!'); }catch{ alert('Arquivo inválido.'); } }; r.readAsText(f); }
 function snapshotMes(){ const m=mstr(); const payload={ month:m, createdAt:new Date().toISOString(), entradas:monthFilter(state.entradas,'date'), despesas:monthFilter(state.despesas,'date'), metas:state.metas, parcelas:state.parcelas, config:state.config }; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'})); a.download=`${m}.json`; a.click(); }
 
-/* Render master */
-function renderAll(){ renderResumo(); renderEntradas(); renderDespesas(); renderParcelas(); renderMetas(); }
+/* Navegação: rolar até a seção (página única) */
+let _drawer,_overlay,_btn;
+function go(tab){
+  const sec=document.getElementById('tab-'+tab);
+  if(sec){ sec.scrollIntoView({behavior:'smooth', block:'start'}); }
+  qsa('.tabs button').forEach(b=>{ const is=b.dataset.tab===tab; b.classList.toggle('active',is); b.setAttribute('aria-selected',String(is)); });
+  closeDrawer();
+}
+
+/* PDF */
+function openPDF(){ document.title='FLOW — Relatório ' + mstr(); window.print(); }
+
+/* Config */
+function applyConfigToUI(){ qs('#cfgDizimo').value=state.config?.dizimo??10; qs('#cfgInvestMax').value=state.config?.investMax??30; }
+function saveConfig(){ state.config.dizimo=Number(qs('#cfgDizimo').value||10); state.config.investMax=Number(qs('#cfgInvestMax').value||30); saveAll(); renderAll(); alert('Configurações salvas.'); }
 
 /* Add handlers */
 function addEntrada(ev){
@@ -219,26 +225,6 @@ function addDespesa(ev){
 }
 function addMeta(ev){ ev.preventDefault(); state.metas.push({ id:uid(), nome:qs('#mNome').value.trim(), alvo:Number(qs('#mAlvo').value||0), ate:qs('#mAte').value, pago:0 }); saveAll(); ev.target.reset(); renderAll(); }
 
-/* Navegação */
-let _drawer,_overlay,_btn;
-function go(tab){
-  // v7.2: apenas rola até a seção; todas ficam visíveis
-  const sec = document.getElementById('tab-'+tab);
-  if(sec){ sec.scrollIntoView({behavior:'smooth', block:'start'}); }
-  // feedback visual nas abas
-  qsa('.tabs button').forEach(b=>{ const is=b.dataset.tab===tab; b.classList.toggle('active',is); b.setAttribute('aria-selected',String(is)); });
-  closeDrawer();
-}); // v7.2: não escondemos mais seções document.getElementById('main').scrollIntoView({behavior:'smooth', block:'start'}); closeDrawer(); }
-function openDrawer(){ _drawer.classList.add('show'); _overlay.classList.add('show'); _btn.setAttribute('aria-expanded','true'); _drawer.setAttribute('aria-hidden','false'); }
-function closeDrawer(){ _drawer.classList.remove('show'); _overlay.classList.remove('show'); _btn.setAttribute('aria-expanded','false'); _drawer.setAttribute('aria-hidden','true'); }
-
-/* Config */
-function applyConfigToUI(){ qs('#cfgDizimo').value=state.config?.dizimo??10; qs('#cfgInvestMax').value=state.config?.investMax??30; }
-function saveConfig(){ state.config.dizimo=Number(qs('#cfgDizimo').value||10); state.config.investMax=Number(qs('#cfgInvestMax').value||30); saveAll(); renderAll(); alert('Configurações salvas.'); }
-
-/* PDF */
-function openPDF(){ document.title='FLOW — Relatório ' + mstr(); window.print(); }
-
 /* Setup */
 function setup(){
   loadAll();
@@ -250,27 +236,28 @@ function setup(){
   // Tabs + Drawer
   qsa('.tabs button').forEach(b=>{ b.id='tab-btn-'+b.dataset.tab; b.addEventListener('click',()=>go(b.dataset.tab)); });
   _drawer=qs('#drawer'); _overlay=qs('#drawerOverlay'); _btn=qs('#btnMenu');
-  _btn.addEventListener('click', openDrawer); _overlay.addEventListener('click', closeDrawer);
-  qsa('.drawer nav a[data-go]').forEach(a=> a.addEventListener('click',(e)=>{e.preventDefault(); go(a.dataset.go);}));
+  _btn.addEventListener('click', ()=>{ _drawer.classList.add('show'); _overlay.classList.add('show'); _btn.setAttribute('aria-expanded','true'); _drawer.setAttribute('aria-hidden','false'); });
+  _overlay.addEventListener('click', ()=>{ _drawer.classList.remove('show'); _overlay.classList.remove('show'); _btn.setAttribute('aria-expanded','false'); _drawer.setAttribute('aria-hidden','true'); });
+  qsa('.drawer nav a[data-go]').forEach(a=> a.addEventListener('click', (e)=>{ e.preventDefault(); go(a.dataset.go); }));
 
   // Gestos
   let sx=null,sy=null,tracking=false;
   window.addEventListener('touchstart',(e)=>{ const t=e.touches[0]; if(t.clientX<24){ sx=t.clientX; sy=t.clientY; tracking=true; } },{passive:true});
-  window.addEventListener('touchmove',(e)=>{ if(!tracking) return; const t=e.touches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ openDrawer(); tracking=false; } },{passive:true});
+  window.addEventListener('touchmove',(e)=>{ if(!tracking) return; const t=e.touches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ _drawer.classList.add('show'); _overlay.classList.add('show'); tracking=false; } },{passive:true});
   window.addEventListener('touchend',()=> tracking=false,{passive:true});
   _drawer.addEventListener('touchstart',(e)=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; tracking=true; },{passive:true});
-  _drawer.addEventListener('touchmove',(e)=>{ if(!tracking) return; const t=e.touches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(dx<-40 && Math.abs(dx)>Math.abs(dy)){ closeDrawer(); tracking=false; } },{passive:true});
+  _drawer.addEventListener('touchmove',(e)=>{ if(!tracking) return; const t=e.touches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(dx<-40 && Math.abs(dx)>Math.abs(dy)){ _drawer.classList.remove('show'); _overlay.classList.remove('show'); tracking=false; } },{passive:true});
 
   // Filters + Buttons
   qs('#filterMonth').addEventListener('change', renderAll);
-  qs('#filterOwner').addEventListener('change', renderAll);
+  qs('#filterOwner').addEventListener('change', renderEntradas); // listas apenas
   qs('#btnPDF').addEventListener('click', openPDF);
   qs('#btnInstall').style.display='none';
   window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); qs('#btnInstall').style.display='inline-block'; qs('#btnInstall').onclick=()=> e.prompt(); });
   if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
 
   // Quick add / forms
-  qs('#btnQuick').addEventListener('click', ()=>{ document.getElementById('qCliente').focus(); });
+  qs('#btnQuick').addEventListener('click', ()=>{ document.getElementById('qCliente').focus(); go('resumo'); });
   qs('#formQuick').addEventListener('submit', addEntradaQuick);
   qs('#formEntrada').addEventListener('submit', addEntrada);
   qs('#formDespesa').addEventListener('submit', addDespesa);

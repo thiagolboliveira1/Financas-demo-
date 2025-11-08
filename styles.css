@@ -1,4 +1,4 @@
-/* FLOW v7 — cards, responsivo, azul NuBlue */
+/* FLOW v7.4 — cards, responsivo, azul NuBlue */
 :root{
   --bg:#F4F7FF; --panel:#E8F0FF; --card:#FFFFFF; --text:#0F1A3A; --muted:#5A6A8A;
   --line:#CDD9F5; --accent:#3F7DFF; --accent-2:#2563EB; --danger:#EF4444;
@@ -53,6 +53,9 @@ footer.bottombar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);
 .drawer.show{transform:translateX(0)}
 .drawer-overlay.show{opacity:1;pointer-events:auto}
 
+/* Âncoras com rolagem (menu -> seção) */
+.tab{scroll-margin-top:140px; display:block;}
+
 /* Responsivo */
 @media (max-width:900px){
   .kpis{grid-template-columns:1fr}
@@ -70,9 +73,3 @@ footer.bottombar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);
   .container{padding:0}
   .card{border:0}
 }
-
-
-/* v7.2: seções empilhadas (uma página), rolagem vertical entre âncoras */
-.tab{scroll-margin-top:140px;}
-/* Remover dependência de .active para exibir/ocultar: tudo visível */
-.tab{display:block;}
