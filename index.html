@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#F4F7FF" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Financeiro Família" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>Financeiro Família — NuBlue</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand hamburger">
+      <button id="btnMenu" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="#235" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <span class="logo">FF</span>
+      <h1>Financeiro Família</h1>
+    </div>
+    <div class="right">
+      <input type="month" id="filterMonth"/>
+      <button id="btnPDF" class="ghost">PDF do mês</button>
+      <button id="btnInstall" class="ghost">Instalar</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="dashboard" class="active">Dashboard</button>
+    <button data-tab="planilha">Planilha</button>
+    <button data-tab="resumo">Resumo</button>
+    <button data-tab="metas">Metas</button>
+  </nav>
+
+  <main class="container">
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab active">
+      <div class="cards">
+        <div class="card kpi"><span>Receitas (mês)</span><strong id="kpiIncome">R$ 0,00</strong></div>
+        <div class="card kpi"><span>Despesas (mês)</span><strong id="kpiExpense">R$ 0,00</strong></div>
+        <div class="card kpi"><span>Saldo (mês)</span><strong id="kpiBalance">R$ 0,00</strong></div>
+      </div>
+      <div class="toolbar">
+        <select id="filterWallet"><option value="">Todas as carteiras</option></select>
+        <select id="filterCategory"><option value="">Todas as categorias</option></select>
+        <select id="filterKind">
+          <option value="">Todas</option>
+          <option value="fixa">Fixas</option>
+          <option value="variavel">Variáveis</option>
+        </select>
+        <button id="btnClearFilters" class="ghost">Limpar</button>
+      </div>
+      <div class="quick">
+        <button id="btnQuickIncome" class="primary">+ Receita</button>
+        <button id="btnQuickExpense" class="primary outline">+ Despesa</button>
+        <button id="btnQuickToday" class="ghost">Hoje</button>
+      </div>
+    </section>
+
+    <!-- PLANILHA -->
+    <section id="tab-planilha" class="tab">
+      <div class="card sheet-head">
+        <form id="formEntry" class="row">
+          <input id="date" type="date" required>
+          <input id="category" placeholder="Categoria" required list="dlCat">
+          <datalist id="dlCat"></datalist>
+          <input id="wallet" placeholder="Carteira" required list="dlWal">
+          <datalist id="dlWal"></datalist>
+          <select id="type"><option value="income">Receita</option><option value="expense">Despesa</option></select>
+          <select id="kind"><option value="variavel">Variável</option><option value="fixa">Fixa</option></select>
+          <input id="amount" type="number" step="0.01" inputmode="decimal" placeholder="Valor (R$)" required>
+          <input id="note" type="text" placeholder="Observação">
+          <button type="submit" class="primary">Adicionar</button>
+        </form>
+      </div>
+      <div class="card sheet">
+        <div class="sheet-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th><th>Categoria</th><th>Carteira</th><th>Tipo</th><th>Valor</th><th>Obs</th><th>Grupo</th><th class="center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="sheet-foot">
+          <div><span>Total Receitas:</span> <strong id="tIncome">R$ 0,00</strong></div>
+          <div><span>Total Despesas:</span> <strong id="tExpense">R$ 0,00</strong></div>
+          <div><span>Saldo do Período:</span> <strong id="tBalance">R$ 0,00</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESUMO -->
+    <section id="tab-resumo" class="tab">
+      <div class="card">
+        <h2>Por Categoria</h2>
+        <ul id="sumByCategory" class="list"></ul>
+      </div>
+      <div class="card">
+        <h2>Fixas vs Variáveis</h2>
+        <ul id="sumByKind" class="list"></ul>
+      </div>
+      <div class="card">
+        <h2>Por Carteira</h2>
+        <ul id="sumByWallet" class="list"></ul>
+      </div>
+    </section>
+
+    <!-- METAS -->
+    <section id="tab-metas" class="tab">
+      <div class="card">
+        <h2>Metas (limite mensal por categoria)</h2>
+        <form id="formBudget" class="toolbar">
+          <input id="budgetCategory" placeholder="Categoria" required list="dlCat">
+          <input id="budgetAmount" type="number" step="0.01" inputmode="decimal" placeholder="Limite (R$)" required>
+          <button class="primary">Definir</button>
+        </form>
+        <ul id="budgets" class="list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar">
+    <span>NuBlue • Local • PDF do mês • Menu lateral com gesto</span>
+  </footer>
+
+  <!-- Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="drawer" id="drawer">
+    <header><strong>Menu</strong></header>
+    <nav>
+      <a href="#" data-go="dashboard"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h7V3H3v9Zm0 9h7v-7H3v7Zm11 0h7v-9h-7v9Zm0-18v7h7V3h-7Z" fill="#3F7DFF"/></svg></span>Dashboard</a>
+      <a href="#" data-go="planilha"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 4h14M9 3v18" stroke="#3F7DFF" stroke-width="2"/></svg></span>Planilha</a>
+      <a href="#" data-go="resumo"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19h16M6 17V7m6 10V5m6 14V11" stroke="#3F7DFF" stroke-width="2" stroke-linecap="round"/></svg></span>Resumo</a>
+      <a href="#" data-go="metas"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12h10a4 4 0 0 1 0 8H4v-8Z" fill="#22C55E"/><path d="M4 12a8 8 0 1 1 8 8" stroke="#3F7DFF" stroke-width="2"/></svg></span>Metas</a>
+      <a href="#" id="goPDF"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" stroke="#3F7DFF" stroke-width="2"/><path d="M14 2v6h6" stroke="#3F7DFF" stroke-width="2"/><path d="M8 14h8M8 18h8" stroke="#3F7DFF" stroke-width="2" stroke-linecap="round"/></svg></span>PDF do mês</a>
+      <a href="#" id="goReset"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 1 1-3-6.7" stroke="#3F7DFF" stroke-width="2"/><path d="M3 12h6" stroke="#3F7DFF" stroke-width="2" stroke-linecap="round"/></svg></span>Resetar dados (local)</a>
+      <a href="#" id="goAbout"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#3F7DFF" stroke-width="2"/><path d="M12 8v.01M12 11v5" stroke="#3F7DFF" stroke-width="2" stroke-linecap="round"/></svg></span>Sobre</a>
+    </nav>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>
