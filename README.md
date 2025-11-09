@@ -9,3 +9,4 @@
 - PIN de acesso (em index.html).
 
 Publicar no GitHub Pages: subir todos os arquivos deste ZIP para a branch main e ativar Pages.
+https://thiagolboliveira1.github.io/Financas-demo-/
