@@ -1,5 +1,5 @@
-/* FLOW v7.4 — soma familiar + scroll de menu + SVG logo */
-const LS={ entradas:"flow:v7_4:entradas",despesas:"flow:v7_4:despesas",metas:"flow:v7_4:metas",parcelas:"flow:v7_4:parcelas",config:"flow:v7_4:config" };
+/* FLOW v8 — soma familiar + scroll de menu + SVG logo */
+const LS={ entradas:"flow:v8:entradas",despesas:"flow:v8:despesas",metas:"flow:v8:metas",parcelas:"flow:v8:parcelas",config:"flow:v8:config" };
 const qs=(s,el=document)=>el.querySelector(s); const qsa=(s,el=document)=>[...el.querySelectorAll(s)];
 const state={ entradas:[], despesas:[], metas:[], parcelas:[], config:{ dizimo:10, investMax:30 } };
 
@@ -40,7 +40,6 @@ function seedParcelas(){
 }
 function monthFilter(list, key){ const m=mstr(); return list.filter(x => (x[key]||"").startsWith(m)); }
 
-/* Totais (KPIs com soma familiar sempre) */
 function totalsEntradas(){
   const arr = monthFilter(state.entradas,'date');
   const rate = (state.config?.dizimo||10)/100;
@@ -58,7 +57,6 @@ function totalsDespesas(){
 }
 function saldoMes(){ const e=totalsEntradas(), d=totalsDespesas(); return {...e,...d,saldo:e.liq-d.total}; }
 
-/* Render Entradas (lista filtrável) */
 function renderEntradas(){
   const wrap=qs('#listaEntradas'); wrap.innerHTML='';
   const rate=(state.config?.dizimo||10)/100;
@@ -88,7 +86,6 @@ function renderEntradas(){
   const t=totalsEntradas(); qs('#entBruto').textContent=money(t.bruto); qs('#entDizimo').textContent=money(t.diz); qs('#entLiquido').textContent=money(t.liq); qs('#entThiago').textContent=money(t.thi); qs('#entAdriele').textContent=money(t.adr);
 }
 
-/* Render Despesas */
 function renderDespesas(){
   const wrap=qs('#listaDespesas'); wrap.innerHTML='';
   const arr=filterByOwner(monthFilter(state.despesas,'date')).sort((a,b)=>a.date.localeCompare(b.date));
@@ -115,7 +112,6 @@ function renderDespesas(){
   const t=totalsDespesas(); qs('#despTotal').textContent=money(t.total); qs('#despFixas').textContent=money(t.fixas); qs('#despVar').textContent=money(t.variaveis); qs('#despShopee').textContent=money(t.shopee);
 }
 
-/* Parcelas */
 function renderParcelas(){
   const wrap=qs('#listaParcelas'); wrap.innerHTML='';
   state.parcelas.forEach(p=>{
@@ -141,7 +137,6 @@ function renderParcelas(){
   });
 }
 
-/* Resumo + Investimento */
 function renderResumo(){
   const s=saldoMes();
   qs('#kBruto').textContent=money(s.bruto); qs('#kDizimo').textContent=money(s.diz); qs('#kLiquido').textContent=money(s.liq);
@@ -153,7 +148,6 @@ function renderResumo(){
   upd(); range.oninput=upd;
 }
 
-/* Metas */
 function renderMetas(){
   const wrap=qs('#metas'); wrap.innerHTML='';
   state.metas.forEach(m=>{
@@ -184,14 +178,12 @@ function renderDistrib(fator){
   metas.forEach((m,i)=>{ const share=invest*(needs[i]/totalNeed)*(1+(i===0?0.15:i===1?0.05:0)); const el=document.createElement('div'); el.className='item'; el.innerHTML=`<div class="top"><strong>${m.nome}</strong><strong>${money(share)}</strong></div>`; distWrap.appendChild(el); });
 }
 
-/* Backup/Snapshot */
 function exportBackup(){ const data={ entradas:state.entradas,despesas:state.despesas,metas:state.metas,parcelas:state.parcelas,config:state.config };
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})); a.download='flow-backup.json'; a.click(); }
 function importBackup(){ const f=qs('#fileImport').files[0]; if(!f) return alert('Selecione um arquivo JSON.');
   const r=new FileReader(); r.onload=()=>{ try{ const o=JSON.parse(r.result); state.entradas=o.entradas||[]; state.despesas=o.despesas||[]; state.metas=o.metas||[]; state.parcelas=o.parcelas||[]; state.config=Object.assign(state.config,o.config||{}); saveAll(); renderAll(); alert('Backup importado!'); }catch{ alert('Arquivo inválido.'); } }; r.readAsText(f); }
 function snapshotMes(){ const m=mstr(); const payload={ month:m, createdAt:new Date().toISOString(), entradas:monthFilter(state.entradas,'date'), despesas:monthFilter(state.despesas,'date'), metas:state.metas, parcelas:state.parcelas, config:state.config }; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'})); a.download=`${m}.json`; a.click(); }
 
-/* Navegação: rolar até a seção (página única) */
 let _drawer,_overlay,_btn;
 function go(tab){
   const sec=document.getElementById('tab-'+tab);
@@ -199,15 +191,12 @@ function go(tab){
   qsa('.tabs button').forEach(b=>{ const is=b.dataset.tab===tab; b.classList.toggle('active',is); b.setAttribute('aria-selected',String(is)); });
   closeDrawer();
 }
+function closeDrawer(){ _drawer.classList.remove('show'); _overlay.classList.remove('show'); _btn.setAttribute('aria-expanded','false'); _drawer.setAttribute('aria-hidden','true'); }
 
-/* PDF */
 function openPDF(){ document.title='FLOW — Relatório ' + mstr(); window.print(); }
-
-/* Config */
 function applyConfigToUI(){ qs('#cfgDizimo').value=state.config?.dizimo??10; qs('#cfgInvestMax').value=state.config?.investMax??30; }
 function saveConfig(){ state.config.dizimo=Number(qs('#cfgDizimo').value||10); state.config.investMax=Number(qs('#cfgInvestMax').value||30); saveAll(); renderAll(); alert('Configurações salvas.'); }
 
-/* Add handlers */
 function addEntrada(ev){
   ev?.preventDefault();
   const e={ id:uid(), owner:qs('#eOwner').value, cliente:qs('#eCliente').value.trim(), forma:qs('#eForma').value.trim(), date:qs('#eDate').value, total:Number(qs('#eTotal').value||0), entrada:Number(qs('#eEntrada').value||0) };
@@ -225,7 +214,6 @@ function addDespesa(ev){
 }
 function addMeta(ev){ ev.preventDefault(); state.metas.push({ id:uid(), nome:qs('#mNome').value.trim(), alvo:Number(qs('#mAlvo').value||0), ate:qs('#mAte').value, pago:0 }); saveAll(); ev.target.reset(); renderAll(); }
 
-/* Setup */
 function setup(){
   loadAll();
   qs('#filterMonth').value=new Date().toISOString().slice(0,7);
@@ -233,37 +221,32 @@ function setup(){
   applyConfigToUI();
   renderAll();
 
-  // Tabs + Drawer
   qsa('.tabs button').forEach(b=>{ b.id='tab-btn-'+b.dataset.tab; b.addEventListener('click',()=>go(b.dataset.tab)); });
   _drawer=qs('#drawer'); _overlay=qs('#drawerOverlay'); _btn=qs('#btnMenu');
   _btn.addEventListener('click', ()=>{ _drawer.classList.add('show'); _overlay.classList.add('show'); _btn.setAttribute('aria-expanded','true'); _drawer.setAttribute('aria-hidden','false'); });
-  _overlay.addEventListener('click', ()=>{ _drawer.classList.remove('show'); _overlay.classList.remove('show'); _btn.setAttribute('aria-expanded','false'); _drawer.setAttribute('aria-hidden','true'); });
+  _overlay.addEventListener('click', closeDrawer);
   qsa('.drawer nav a[data-go]').forEach(a=> a.addEventListener('click', (e)=>{ e.preventDefault(); go(a.dataset.go); }));
 
-  // Gestos
   let sx=null,sy=null,tracking=false;
   window.addEventListener('touchstart',(e)=>{ const t=e.touches[0]; if(t.clientX<24){ sx=t.clientX; sy=t.clientY; tracking=true; } },{passive:true});
   window.addEventListener('touchmove',(e)=>{ if(!tracking) return; const t=e.touches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)){ _drawer.classList.add('show'); _overlay.classList.add('show'); tracking=false; } },{passive:true});
   window.addEventListener('touchend',()=> tracking=false,{passive:true});
   _drawer.addEventListener('touchstart',(e)=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; tracking=true; },{passive:true});
-  _drawer.addEventListener('touchmove',(e)=>{ if(!tracking) return; const t=e.touches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(dx<-40 && Math.abs(dx)>Math.abs(dy)){ _drawer.classList.remove('show'); _overlay.classList.remove('show'); tracking=false; } },{passive:true});
+  _drawer.addEventListener('touchmove',(e)=>{ if(!tracking) return; const t=e.touches[0]; const dx=t.clientX-sx, dy=t.clientY-sy; if(dx<-40 && Math.abs(dx)>Math.abs(dy)){ closeDrawer(); tracking=false; } },{passive:true});
 
-  // Filters + Buttons
   qs('#filterMonth').addEventListener('change', renderAll);
-  qs('#filterOwner').addEventListener('change', renderEntradas); // listas apenas
+  qs('#filterOwner').addEventListener('change', renderEntradas);
   qs('#btnPDF').addEventListener('click', openPDF);
   qs('#btnInstall').style.display='none';
   window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); qs('#btnInstall').style.display='inline-block'; qs('#btnInstall').onclick=()=> e.prompt(); });
   if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
 
-  // Quick add / forms
   qs('#btnQuick').addEventListener('click', ()=>{ document.getElementById('qCliente').focus(); go('resumo'); });
   qs('#formQuick').addEventListener('submit', addEntradaQuick);
   qs('#formEntrada').addEventListener('submit', addEntrada);
   qs('#formDespesa').addEventListener('submit', addDespesa);
   qs('#formMeta').addEventListener('submit', addMeta);
 
-  // Backup
   qs('#btnExport').addEventListener('click', exportBackup);
   qs('#btnImport').addEventListener('click', importBackup);
   qs('#btnSnapshot').addEventListener('click', snapshotMes);

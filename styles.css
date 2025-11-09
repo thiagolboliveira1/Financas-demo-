@@ -1,4 +1,4 @@
-/* FLOW v7.4 — cards, responsivo, azul NuBlue */
+/* FLOW v8 — cards, responsivo, azul NuBlue */
 :root{
   --bg:#F4F7FF; --panel:#E8F0FF; --card:#FFFFFF; --text:#0F1A3A; --muted:#5A6A8A;
   --line:#CDD9F5; --accent:#3F7DFF; --accent-2:#2563EB; --danger:#EF4444;
@@ -32,7 +32,7 @@ button.primary{background:var(--accent);color:#fff;border-color:transparent}
 .stack{display:grid;gap:10px}
 .item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:8px}
 .item .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.item .meta{display:flex;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.95rem}
+.item .meta{display:flex;gap:8px;flex-wrap:wrap;color:#5A6A8A;font-size:.95rem}
 .item .amt{font-weight:700}
 .badge{padding:4px 10px;border:1px solid var(--line);border-radius:999px;font-size:.85rem;color:#235;background:#f7faff}
 .actions{display:flex;gap:8px}
@@ -41,7 +41,7 @@ button.primary{background:var(--accent);color:#fff;border-color:transparent}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .progress{height:10px;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#eef3ff}
 .progress .bar{height:100%;background:var(--accent)}
-footer.bottombar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--line);padding:10px;text-align:center;color:var(--muted)}
+footer.bottombar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--line);padding:10px;text-align:center;color:#5A6A8A}
 
 /* Drawer */
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,20,60,.25);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .2s ease}
