@@ -1,1 +1,1 @@
-self.addEventListener('fetch',()=>{})
+/* sw off v8.3 */
