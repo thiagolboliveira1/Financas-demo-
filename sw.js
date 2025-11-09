@@ -1,1 +1,1 @@
-/* sw off v8.4.1 */
+const CACHE='flow-v9-final-v1';self.addEventListener('install',e=>{self.skipWaiting()});self.addEventListener('activate',e=>{self.clients.claim()});
